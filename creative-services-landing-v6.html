@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Services</title>
+  <style>
+    :root {
+      --bg-page: #f2f2f2;
+      --bg-card: #ffffff;
+      --text-heading: #111111;
+      --text-body: #333333;
+      --accent: #1a8cff;
+      --accent-hover: #0073e6;
+      --border-subtle: #e5e5e5;
+      --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.02);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Open Sans", Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-body);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 84px 24px 64px;
+      transition: background-color 0.25s ease;
+    }
+
+    /* Панель переключения адаптива (как на превью Nicepage) */
+    .viewport-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 0 16px;
+      z-index: 500;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .vp-btn {
+      width: 38px;
+      height: 36px;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #555555;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .vp-btn:hover {
+      background: #f0f4f8;
+      color: #111111;
+    }
+
+    .vp-btn.active {
+      background: #e8f3ff;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .vp-label {
+      margin-left: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666666;
+      min-width: 115px;
+    }
+
+    /* Обёртка, имитирующая ширину выбранного устройства */
+    .preview-stage {
+      width: 100%;
+      max-width: 1140px;
+      margin: auto;
+      transition: max-width 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), padding 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .preview-stage.mode-laptop {
+      max-width: 960px;
+    }
+
+    .preview-stage.mode-tablet {
+      max-width: 740px;
+    }
+
+    .preview-stage.mode-phone-h {
+      max-width: 540px;
+    }
+
+    .preview-stage.mode-phone {
+      max-width: 375px;
+    }
+
+    /* Подсветка границ в режимах эмуляции на ПК */
+    .preview-stage:not(.mode-desktop) {
+      background: #f2f2f2;
+      border: 1px dashed #cccccc;
+      border-radius: 16px;
+      padding: 28px 20px;
+    }
+
+    .services-section {
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: clamp(24px, 3.6vw, 40px);
+      font-weight: 400;
+      color: var(--text-heading);
+      letter-spacing: -0.02em;
+      margin-bottom: 44px;
+      line-height: 1.2;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .service-card {
+      background-color: var(--bg-card);
+      border-radius: 0 38px 0 0;
+      padding: 36px 32px 42px;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.07);
+    }
+
+    .icon-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      margin-bottom: 24px;
+      flex-shrink: 0;
+      transition: transform 0.25s ease, background-color 0.25s ease;
+    }
+
+    .service-card:hover .icon-circle {
+      background-color: var(--accent-hover);
+      transform: scale(1.06);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .card-text {
+      font-size: 14px;
+      color: var(--text-body);
+      line-height: 1.65;
+    }
+
+    /* Стили при переключении кнопками на ПК */
+    .preview-stage.mode-laptop .services-grid {
+      gap: 20px;
+    }
+
+    .preview-stage.mode-laptop .service-card {
+      padding: 30px 24px 36px;
+    }
+
+    .preview-stage.mode-tablet .section-title {
+      font-size: 32px;
+      margin-bottom: 32px;
+    }
+
+    .preview-stage.mode-tablet .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+
+    .preview-stage.mode-phone-h .section-title,
+    .preview-stage.mode-phone .section-title {
+      font-size: 26px;
+      margin-bottom: 24px;
+    }
+
+    .preview-stage.mode-phone-h .services-grid,
+    .preview-stage.mode-phone .services-grid {
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .preview-stage.mode-phone-h .service-card,
+    .preview-stage.mode-phone .service-card {
+      padding: 26px 22px 30px;
+      border-radius: 0 30px 0 0;
+    }
+
+    .preview-stage.mode-phone .icon-circle {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 18px;
+    }
+
+    /* Естественная адаптивность при изменении ширины окна */
+    @media (max-width: 1024px) {
+      .services-grid {
+        gap: 20px;
+      }
+      .service-card {
+        padding: 30px 24px 36px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      body {
+        padding: 76px 20px 44px;
+      }
+      .section-title {
+        margin-bottom: 32px;
+      }
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+      .preview-stage:not(.mode-desktop) {
+        border: none;
+        padding: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 72px 16px 36px;
+      }
+      .vp-label {
+        display: none;
+      }
+      .section-title {
+        margin-bottom: 24px;
+      }
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .service-card {
+        padding: 28px 22px 32px;
+        border-radius: 0 30px 0 0;
+      }
+      .icon-circle {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 18px;
+      }
+      .card-title {
+        font-size: 17px;
+        margin-bottom: 12px;
+      }
+    }
+
+    /* Модальное окно */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      color: var(--text-body);
+      width: 100%;
+      max-width: 440px;
+      border-radius: 0 32px 0 0;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      background: none;
+      border: none;
+      font-size: 26px;
+      line-height: 1;
+      color: var(--text-body);
+      cursor: pointer;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-heading);
+      margin-bottom: 8px;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      margin-bottom: 20px;
+      opacity: 0.85;
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      background: var(--bg-page);
+      color: var(--text-heading);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-field input:focus {
+      border-color: var(--accent);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .form-status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Панель переключения режимов экрана -->
+  <div class="viewport-bar" role="toolbar" aria-label="Viewport switcher">
+    <button type="button" class="vp-btn active" data-mode="desktop" data-label="Desktop (1140px)" title="Desktop">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </button>
+    <button type="button" class="vp-btn" data-mode="laptop" data-label="Laptop (960px)" title="Laptop">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="12" rx="2"/>
+        <line x1="1" y1="20" x2="23" y2="20"/>
+      </svg>
+    </button>
+    <button type="button" class="vp-btn" data-mode="tablet" data-label="Tablet (740px)" title="Tablet">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+    </button>
+    <button type="button" class="vp-btn" data-mode="phone-h" data-label="Phone Horiz (540px)" title="Phone Horizontal">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="6" width="20" height="12" rx="2"/>
+        <line x1="18" y1="12" x2="18.01" y2="12"/>
+      </svg>
+    </button>
+    <button type="button" class="vp-btn" data-mode="phone" data-label="Phone (375px)" title="Phone Vertical">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="6" y="2" width="12" height="20" rx="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+    </button>
+    <span class="vp-label" id="vpLabel">Desktop (1140px)</span>
+  </div>
+
+  <div class="preview-stage mode-desktop" id="previewStage">
+    <main class="services-section">
+      <h1 class="section-title">We provide a wide range of creative services</h1>
+
+      <div class="services-grid">
+        <!-- Card 1 -->
+        <article class="service-card" data-service="Hight Quality">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18h6"/>
+              <path d="M10 22h4"/>
+              <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1.1 2h5.8c.1-.8.5-1.5 1.1-2A7 7 0 0 0 12 2z"/>
+              <line x1="12" y1="6" x2="12" y2="8"/>
+              <line x1="7.5" y1="8.5" x2="9" y2="9.5"/>
+              <line x1="16.5" y1="8.5" x2="15" y2="9.5"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Hight Quality</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="service-card" data-service="Creative Team">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Creative Team</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="service-card" data-service="Amazing Results">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="6" y="2" width="12" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18"/>
+              <path d="M9 7h6M9 11h4"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Amazing Results</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="service-card" data-service="Best Pricing">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Best Pricing</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="service-card" data-service="Innovations">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11z"/>
+              <circle cx="12" cy="11" r="2.2"/>
+            </svg>
+          </div>
+          <h2 class="card-title">Innovations</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="service-card" data-service="24/7 Support">
+          <div class="icon-circle" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
+              <circle cx="10" cy="7" r="4"/>
+              <path d="M21 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h2 class="card-title">24/7 Support</h2>
+          <p class="card-text">Vitae suscipit tellus mauris a diam maecenas sed enim ut. Mauris augue neque gravida in fermentum. Praesent semper feugiat nibh sed pulvinar proin id venenatis.</p>
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <!-- Модальное окно -->
+  <div class="modal-backdrop" id="orderModal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" class="modal-close" id="closeModalBtn" aria-label="Close">&times;</button>
+      <h3 class="modal-title" id="modalTitle">Order Creative Service</h3>
+      <p class="modal-subtitle" id="modalSubtitle">Selected service: High Quality</p>
+      <form id="orderForm">
+        <div class="form-field">
+          <input type="text" id="clientName" placeholder="Your Name" required>
+        </div>
+        <div class="form-field">
+          <input type="email" id="clientEmail" placeholder="Your Email" required>
+        </div>
+        <button type="submit" class="submit-btn">Send Request</button>
+        <div class="form-status" id="formStatus"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const vpButtons = document.querySelectorAll('.vp-btn');
+      const previewStage = document.getElementById('previewStage');
+      const vpLabel = document.getElementById('vpLabel');
+
+      vpButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          vpButtons.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const mode = btn.getAttribute('data-mode');
+          const label = btn.getAttribute('data-label');
+
+          previewStage.className = 'preview-stage mode-' + mode;
+          vpLabel.textContent = label;
+        });
+      });
+
+      // Модальное окно заказа
+      const modal = document.getElementById('orderModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const modalSubtitle = document.getElementById('modalSubtitle');
+      const orderForm = document.getElementById('orderForm');
+      const formStatus = document.getElementById('formStatus');
+      const serviceCards = document.querySelectorAll('.service-card');
+
+      function openModal(serviceName) {
+        modalSubtitle.textContent = 'Selected service: ' + serviceName;
+        formStatus.textContent = '';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      serviceCards.forEach((card) => {
+        card.addEventListener('click', () => {
+          openModal(card.getAttribute('data-service'));
+        });
+      });
+
+      closeModalBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+          closeModal();
+        }
+      });
+
+      orderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('clientName').value.trim();
+        formStatus.textContent = 'Thank you, ' + name + '! Your request has been sent.';
+        orderForm.reset();
+        setTimeout(closeModal, 1800);
+      });
+    })();
+  </script>
+</body>
+</html>
